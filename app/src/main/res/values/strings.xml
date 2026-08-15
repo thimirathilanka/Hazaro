@@ -1,3 +1,36 @@
 <resources>
     <string name="app_name">Hazaro</string>
+    <string name="tagline">Report hazards. Keep roads open.</string>
+    <string name="home_title">Hazaro</string>
+    <string name="add_report">Add report</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Create account</string>
+    <string name="sign_out">Sign out</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="need_account">Need an account? Create one</string>
+    <string name="have_account">Already have an account? Sign in</string>
+    <string name="auth_guest_hint">You can browse reports without an account. Sign in to add one.</string>
+    <string name="location_permission_title">Location needed</string>
+    <string name="location_permission_body">Allow location so we can show you on the map and attach it to new reports.</string>
+    <string name="allow_location">Allow location</string>
+    <string name="maps_key_missing">Add MAPS_API_KEY to local.properties to show the map.</string>
+    <string name="reports_error">Could not load reports. Pull out of this screen and try again.</string>
+    <string name="reports_permission_denied">Could not load reports. Firestore rules are blocking this app — in Firebase Console, allow reads on the reports collection.</string>
+    <string name="report_type">What happened?</string>
+    <string name="description">Description</string>
+    <string name="description_hint">Road blocked near the bridge, debris on both lanes…</string>
+    <string name="add_photo">Add photo</string>
+    <string name="change_photo">Change photo</string>
+    <string name="using_current_location">Using your current location</string>
+    <string name="location_unavailable">Could not read your location. Enable GPS and try again.</string>
+    <string name="submit_report">Submit report</string>
+    <string name="uploading_photo">Uploading photo…</string>
+    <string name="saving_report">Saving report…</string>
+    <string name="close">Close</string>
+    <string name="reported_by">Reported by %1$s</string>
+    <string name="no_description">No extra details</string>
+    <string name="account">Account</string>
+    <string name="signed_in_as">Signed in as %1$s</string>
+    <string name="cancel">Cancel</string>
 </resources>
