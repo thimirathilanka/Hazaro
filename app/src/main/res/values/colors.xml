@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="hazaro_bg">#FFF3F6F5</color>
+    <color name="hazaro_icon_bg">#FF071422</color>
     <color name="hazaro_teal">#FF1A6B6C</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>

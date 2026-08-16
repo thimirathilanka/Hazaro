@@ -4,5 +4,8 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@color/hazaro_bg</item>
+        <item name="android:windowSplashScreenBackground">@color/hazaro_icon_bg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/hazaro_icon_bg</item>
     </style>
 </resources>

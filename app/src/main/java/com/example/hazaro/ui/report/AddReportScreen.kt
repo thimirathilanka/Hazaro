@@ -1,7 +1,9 @@
 package com.example.hazaro.ui.report
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,13 +15,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -27,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Photo
+import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,8 +63,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
+import kotlinx.coroutines.delay
 import com.example.hazaro.R
 import com.example.hazaro.data.model.DisasterType
 import com.example.hazaro.ui.components.MapZoomButtons
@@ -82,15 +92,54 @@ fun AddReportScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val hasCamera = remember {
+        context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+    }
+    var pendingCaptureUri by remember { mutableStateOf<Uri?>(null) }
     val photoPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia(),
-    ) { uri -> viewModel.onPhotoPicked(uri) }
+    ) { uri -> if (uri != null) viewModel.onPhotoPicked(uri) }
+    val takePicture = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture(),
+    ) { success ->
+        val uri = pendingCaptureUri
+        if (success && uri != null) viewModel.onPhotoPicked(uri)
+    }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            val uri = context.createReportPhotoUri()
+            pendingCaptureUri = uri
+            takePicture.launch(uri)
+        }
+    }
+    fun launchCamera() {
+        val granted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA,
+        ) == PackageManager.PERMISSION_GRANTED
+        if (granted) {
+            val uri = context.createReportPhotoUri()
+            pendingCaptureUri = uri
+            takePicture.launch(uri)
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) { grants ->
         val granted = grants[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
             grants[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         if (granted) viewModel.refreshLocation()
+    }
+
+    val formScroll = rememberScrollState()
+    LaunchedEffect(uiState.photoUri) {
+        if (uiState.photoUri == null) return@LaunchedEffect
+        delay(50)
+        formScroll.animateScrollTo(formScroll.maxValue)
     }
 
     LaunchedEffect(Unit) {
@@ -147,7 +196,8 @@ fun AddReportScreen(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .verticalScroll(rememberScrollState()),
+                        .fillMaxWidth()
+                        .verticalScroll(formScroll),
                 ) {
                     Text(
                         text = stringResource(R.string.report_type),
@@ -172,41 +222,66 @@ fun AddReportScreen(
                         onValueChange = viewModel::onDescriptionChange,
                         label = { Text(stringResource(R.string.description)) },
                         placeholder = { Text(stringResource(R.string.description_hint)) },
-                        minLines = 3,
+                        minLines = 2,
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(modifier = Modifier.height(20.dp))
-                    OutlinedButton(
-                        onClick = {
-                            photoPicker.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
-                            )
-                        },
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Photo,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.padding(4.dp))
-                        Text(
-                            text = if (uiState.photoUri == null) {
-                                stringResource(R.string.add_photo)
-                            } else {
-                                stringResource(R.string.change_photo)
+                        if (hasCamera) {
+                            OutlinedButton(
+                                onClick = ::launchCamera,
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.PhotoCamera,
+                                    contentDescription = null,
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(stringResource(R.string.take_photo))
+                            }
+                        }
+                        OutlinedButton(
+                            onClick = {
+                                photoPicker.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                                )
                             },
-                        )
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Photo,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (hasCamera) {
+                                    stringResource(R.string.choose_photo)
+                                } else if (uiState.photoUri == null) {
+                                    stringResource(R.string.add_photo)
+                                } else {
+                                    stringResource(R.string.change_photo)
+                                },
+                            )
+                        }
                     }
                     uiState.photoUri?.let { uri ->
                         Spacer(modifier = Modifier.height(12.dp))
                         AsyncImage(
-                            model = uri,
+                            model = ImageRequest.Builder(context)
+                                .data(uri)
+                                .memoryCachePolicy(CachePolicy.DISABLED)
+                                .diskCachePolicy(CachePolicy.DISABLED)
+                                .build(),
                             contentDescription = stringResource(R.string.add_photo),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(180.dp)
-                                .clip(RoundedCornerShape(18.dp)),
+                                .requiredHeight(180.dp)
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -396,4 +471,10 @@ private fun LocationPickerMap(
             }
         }
     }
+}
+
+private fun Context.createReportPhotoUri(): Uri {
+    val directory = java.io.File(cacheDir, "camera").apply { mkdirs() }
+    val file = java.io.File(directory, "report_${System.currentTimeMillis()}.jpg")
+    return FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
 }

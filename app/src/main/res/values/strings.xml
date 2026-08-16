@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Hazaro</string>
-    <string name="tagline">Report hazards. Keep roads open.</string>
+    <string name="tagline">Report hazards, spread awareness.</string>
     <string name="home_title">Hazaro</string>
     <string name="add_report">Add report</string>
     <string name="sign_in">Sign in</string>
@@ -8,6 +8,9 @@
     <string name="sign_out">Sign out</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
     <string name="need_account">Need an account? Create one</string>
     <string name="have_account">Already have an account? Sign in</string>
     <string name="auth_guest_hint">You can browse reports without an account. Sign in to add one.</string>
@@ -21,6 +24,8 @@
     <string name="description">Description</string>
     <string name="description_hint">Road blocked near the bridge, debris on both lanes…</string>
     <string name="add_photo">Add photo (optional)</string>
+    <string name="take_photo">Take photo</string>
+    <string name="choose_photo">Gallery</string>
     <string name="change_photo">Change photo</string>
     <string name="using_current_location">Using your current location. Tap the map to move the pin.</string>
     <string name="using_picked_location">Pin placed on the map. Tap to adjust.</string>
