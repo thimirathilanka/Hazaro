@@ -20,10 +20,11 @@
     <string name="report_type">What happened?</string>
     <string name="description">Description</string>
     <string name="description_hint">Road blocked near the bridge, debris on both lanes…</string>
-    <string name="add_photo">Add photo</string>
+    <string name="add_photo">Add photo (optional)</string>
     <string name="change_photo">Change photo</string>
-    <string name="using_current_location">Using your current location</string>
-    <string name="location_unavailable">Could not read your location. Enable GPS and try again.</string>
+    <string name="using_current_location">Using your current location. Tap the map to move the pin.</string>
+    <string name="using_picked_location">Pin placed on the map. Tap to adjust.</string>
+    <string name="location_unavailable">Could not read GPS. Tap the map to drop a pin.</string>
     <string name="submit_report">Submit report</string>
     <string name="uploading_photo">Uploading photo…</string>
     <string name="saving_report">Saving report…</string>
@@ -33,4 +34,7 @@
     <string name="account">Account</string>
     <string name="signed_in_as">Signed in as %1$s</string>
     <string name="cancel">Cancel</string>
+    <string name="my_location">My location</string>
+    <string name="zoom_in">Zoom in</string>
+    <string name="zoom_out">Zoom out</string>
 </resources>
