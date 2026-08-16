@@ -15,6 +15,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,10 +32,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.hazaro.R
@@ -100,15 +106,19 @@ fun AuthScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
+            PasswordField(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text(stringResource(R.string.password)) },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth(),
+                label = stringResource(R.string.password),
             )
+            if (uiState.isSignUp) {
+                Spacer(modifier = Modifier.height(12.dp))
+                PasswordField(
+                    value = uiState.confirmPassword,
+                    onValueChange = viewModel::onConfirmPasswordChange,
+                    label = stringResource(R.string.confirm_password),
+                )
+            }
             uiState.error?.let { error ->
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -156,4 +166,40 @@ fun AuthScreen(
             Spacer(modifier = Modifier.statusBarsPadding())
         }
     }
+}
+
+@Composable
+private fun PasswordField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+) {
+    var visible by rememberSaveable { mutableStateOf(false) }
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        singleLine = true,
+        visualTransformation = if (visible) {
+            VisualTransformation.None
+        } else {
+            PasswordVisualTransformation()
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        trailingIcon = {
+            IconButton(onClick = { visible = !visible }) {
+                Icon(
+                    imageVector = if (visible) {
+                        Icons.Outlined.VisibilityOff
+                    } else {
+                        Icons.Outlined.Visibility
+                    },
+                    contentDescription = stringResource(
+                        if (visible) R.string.hide_password else R.string.show_password,
+                    ),
+                )
+            }
+        },
+        modifier = Modifier.fillMaxWidth(),
+    )
 }

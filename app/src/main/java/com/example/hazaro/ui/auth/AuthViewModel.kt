@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 data class AuthUiState(
     val email: String = "",
     val password: String = "",
+    val confirmPassword: String = "",
     val isSignUp: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -33,8 +34,18 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(password = value, error = null) }
     }
 
+    fun onConfirmPasswordChange(value: String) {
+        _uiState.update { it.copy(confirmPassword = value, error = null) }
+    }
+
     fun toggleMode() {
-        _uiState.update { it.copy(isSignUp = !it.isSignUp, error = null) }
+        _uiState.update {
+            it.copy(
+                isSignUp = !it.isSignUp,
+                confirmPassword = "",
+                error = null,
+            )
+        }
     }
 
     fun submit() {
@@ -47,6 +58,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
         if (password.length < 6) {
             _uiState.update { it.copy(error = "Password should be at least 6 characters.") }
+            return
+        }
+        if (state.isSignUp && password != state.confirmPassword) {
+            _uiState.update { it.copy(error = "Passwords do not match.") }
             return
         }
         viewModelScope.launch {
