@@ -20,8 +20,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Login
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.AlertDialog
@@ -215,7 +215,7 @@ fun HomeScreen(
                             imageVector = if (uiState.isSignedIn) {
                                 Icons.Outlined.Person
                             } else {
-                                Icons.Outlined.Login
+                                Icons.AutoMirrored.Outlined.Login
                             },
                             contentDescription = stringResource(R.string.account),
                         )
